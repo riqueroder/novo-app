@@ -19,12 +19,11 @@ export default function TattoARApp() {
       image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/8e2d1ae1-2df5-4b85-91e2-a8eebe69640d.png', 
       complexity: 'Alta' 
     },
-    { id: 2, name: 'Rosa Realista', style: 'Realista', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop', complexity: 'Média' },
-    { id: 3, name: 'Geométrico Minimal', style: 'Minimalista', image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=300&h=300&fit=crop', complexity: 'Baixa' },
-    { id: 4, name: 'Mandala Sagrada', style: 'Geométrico', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop', complexity: 'Alta' },
-    { id: 5, name: 'Aquarela Abstrata', style: 'Aquarela', image: 'https://images.unsplash.com/photo-1565058379802-bbe93b2f703a?w=300&h=300&fit=crop', complexity: 'Média' },
-    { id: 6, name: 'Biomecânico', style: 'Cyber', image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=300&h=300&fit=crop', complexity: 'Alta' }
-  ];
+    { id: 2, name: 'Rosa Realista', style: 'Realista', image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/46ee15c0-f745-46df-b2a2-4105b46f9c9f.jpg', complexity: 'Média' },
+    { id: 3, name: 'Geométrico Minimal', style: 'Minimalista', image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/74feb63b-b8f2-4195-8cb4-d7c3aae88a70.png', complexity: 'Baixa' },
+    { id: 4, name: 'Mandala Sagrada', style: 'Geométrico', image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/7eb35369-936f-4528-b47f-d19ffb1edeeb.png', complexity: 'Alta' },
+    { id: 5, name: 'Aquarela Abstrata', style: 'Aquarela', image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/336e1ecd-c315-48fd-9d57-84adbf7049b0.png', complexity: 'Média' },
+    { id: 6, name: 'Biomecânico', style: 'Cyber', image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/f61a7904-44a9-4848-bf10-6d3f4e6d9d46.png', complexity: 'Alta' }
 
   const testimonials = [
     {
