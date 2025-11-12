@@ -10,7 +10,7 @@ interface ARCameraProps {
     id: number;
     name: string;
     image: string;
-  } | null;
+  };
 }
 
 export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraProps) {
@@ -36,12 +36,86 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
 
   const currentTattoo = selectedTattoo || defaultTattoo;
 
+  // Solicitar permissão e ativar câmera traseira
+  const requestCameraPermission = async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      // Verificar se navegador suporta getUserMedia
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Seu navegador não suporta acesso à câmera. Use Chrome, Safari ou Firefox atualizado.');
+      }
+
+      // Solicitar câmera traseira (environment) com alta resolução
+      const constraints = {
+        video: {
+          facingMode: { ideal: 'environment' }, // Câmera traseira
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          aspectRatio: { ideal: 16/9 }
+        },
+        audio: false
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+        
+        // Aguardar vídeo carregar
+        await new Promise((resolve) => {
+          if (videoRef.current) {
+            videoRef.current.onloadedmetadata = resolve;
+          }
+        });
+
+        setCameraPermission('granted');
+        setIsARActive(true);
+        
+        console.log('✅ Câmera traseira ativada com sucesso');
+        console.log('📹 Resolução:', stream.getVideoTracks()[0].getSettings());
+        
+        // Simular detecção de superfície (em produção, usar ARCore/ARKit via WebXR)
+        setTimeout(() => {
+          setSkinDetected(true);
+          console.log('✅ Superfície detectada - Tatuagem projetada');
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error('❌ Erro ao acessar câmera:', error);
+      
+      let errorMsg = 'Erro ao acessar câmera. ';
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMsg += 'Permissão negada. Permita o acesso à câmera nas configurações do navegador.';
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        errorMsg += 'Nenhuma câmera encontrada no dispositivo.';
+      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+        errorMsg += 'Câmera está sendo usada por outro aplicativo.';
+      } else if (error.name === 'OverconstrainedError') {
+        errorMsg += 'Câmera traseira não disponível. Tentando câmera frontal...';
+        // Tentar câmera frontal como fallback
+        tryFrontCamera();
+        return;
+      } else {
+        errorMsg += error.message || 'Erro desconhecido.';
+      }
+      
+      setErrorMessage(errorMsg);
+      setCameraPermission('denied');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Fallback: tentar câmera frontal
   const tryFrontCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'user',
+          facingMode: 'user', // Câmera frontal
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
@@ -65,74 +139,6 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
     }
   };
 
-  // Solicitar permissão e ativar câmera traseira
-  const requestCameraPermission = async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Seu navegador não suporta acesso à câmera. Use Chrome, Safari ou Firefox atualizado.');
-      }
-
-      const constraints = {
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          aspectRatio: { ideal: 16/9 }
-        },
-        audio: false
-      };
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        
-        videoRef.current.onloadedmetadata = () => {
-          setCameraPermission('granted');
-          setIsARActive(true);
-          
-          console.log('✅ Câmera traseira ativada com sucesso');
-          
-          setTimeout(() => {
-            setSkinDetected(true);
-            console.log('✅ Superfície detectada - Tatuagem projetada');
-          }, 2000);
-        };
-
-        await videoRef.current.play();
-      }
-    } catch (error: unknown) {
-      console.error('❌ Erro ao acessar câmera:', error);
-      
-      let errorMsg = 'Erro ao acessar câmera. ';
-      
-      if (error instanceof Error) {
-        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-          errorMsg += 'Permissão negada. Permita o acesso à câmera nas configurações do navegador.';
-        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-          errorMsg += 'Nenhuma câmera encontrada no dispositivo.';
-        } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
-          errorMsg += 'Câmera está sendo usada por outro aplicativo.';
-        } else if (error.name === 'OverconstrainedError') {
-          errorMsg += 'Câmera traseira não disponível. Tentando câmera frontal...';
-          tryFrontCamera();
-          return;
-        } else {
-          errorMsg += error.message || 'Erro desconhecido.';
-        }
-      }
-      
-      setErrorMessage(errorMsg);
-      setCameraPermission('denied');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Capturar foto com tatuagem projetada
   const capturePhoto = () => {
     if (!canvasRef.current || !videoRef.current) {
@@ -147,21 +153,26 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
     
     if (ctx) {
       try {
+        // Configurar canvas com dimensões do vídeo
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         
+        // Desenhar frame do vídeo
         ctx.drawImage(video, 0, 0);
         
+        // Desenhar tatuagem sobre o frame
         const tattooImg = new Image();
         tattooImg.crossOrigin = 'anonymous';
         tattooImg.src = currentTattoo.image;
         
         tattooImg.onload = () => {
+          // Calcular posição e tamanho da tatuagem
           const tattooWidth = (canvas.width * tattooSize) / 100;
-          const tattooHeight = tattooWidth;
+          const tattooHeight = tattooWidth; // Manter proporção
           const x = (canvas.width * tattooPosition.x) / 100 - tattooWidth / 2;
           const y = (canvas.height * tattooPosition.y) / 100 - tattooHeight / 2;
           
+          // Aplicar transformações
           ctx.save();
           ctx.translate(x + tattooWidth / 2, y + tattooHeight / 2);
           ctx.rotate((tattooRotation * Math.PI) / 180);
@@ -169,6 +180,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
           ctx.drawImage(tattooImg, -tattooWidth / 2, -tattooHeight / 2, tattooWidth, tattooHeight);
           ctx.restore();
           
+          // Download da imagem
           setTimeout(() => {
             const link = document.createElement('a');
             link.download = `tattoar-preview-${currentTattoo.name.toLowerCase().replace(/\s/g, '-')}-${Date.now()}.jpg`;
@@ -192,12 +204,14 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
     }
   };
 
+  // Resetar posição da tatuagem
   const resetTattoo = () => {
     setTattooSize(50);
     setTattooPosition({ x: 50, y: 50 });
     setTattooRotation(0);
   };
 
+  // Limpar recursos ao fechar ou desmontar
   useEffect(() => {
     return () => {
       if (streamRef.current) {
@@ -210,6 +224,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
     };
   }, []);
 
+  // Iniciar câmera automaticamente ao abrir
   useEffect(() => {
     if (isOpen && cameraPermission === 'pending') {
       requestCameraPermission();
@@ -220,6 +235,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
+      {/* Header da câmera AR */}
       <div className="relative z-10 bg-black/80 backdrop-blur-sm border-b border-white/20">
         <div className="flex items-center justify-between p-4">
           <button
@@ -248,7 +264,9 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
         </div>
       </div>
 
+      {/* Área principal da câmera */}
       <div className="flex-1 relative overflow-hidden">
+        {/* Estado: Aguardando permissão */}
         {cameraPermission === 'pending' && !isLoading && (
           <div className="absolute inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
             <div className="w-20 h-20 border-4 border-white/30 rounded-full flex items-center justify-center mb-6">
@@ -267,6 +285,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
           </div>
         )}
 
+        {/* Estado: Carregando */}
         {isLoading && (
           <div className="absolute inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
             <div className="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
@@ -277,6 +296,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
           </div>
         )}
 
+        {/* Estado: Permissão negada */}
         {cameraPermission === 'denied' && !isLoading && (
           <div className="absolute inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
             <div className="w-20 h-20 border-4 border-red-500/50 rounded-full flex items-center justify-center mb-6">
@@ -295,8 +315,10 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
           </div>
         )}
 
+        {/* Estado: Câmera ativa */}
         {cameraPermission === 'granted' && (
           <>
+            {/* Video da câmera */}
             <video
               ref={videoRef}
               autoPlay
@@ -305,9 +327,12 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
               className="w-full h-full object-cover"
             />
             
+            {/* Canvas para captura */}
             <canvas ref={canvasRef} className="hidden" />
 
+            {/* Overlay AR */}
             <div className="absolute inset-0 pointer-events-none">
+              {/* Grid de detecção sutil */}
               <div className="absolute inset-0 opacity-10">
                 <div className="grid grid-cols-8 gap-px h-full">
                   {Array.from({ length: 64 }).map((_, i) => (
@@ -316,6 +341,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
                 </div>
               </div>
 
+              {/* Indicadores de status */}
               <div className="absolute top-4 left-4 right-4 flex justify-between">
                 <div className={`px-3 py-1 rounded-lg text-sm font-medium border ${
                   isARActive 
@@ -334,6 +360,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
                 </div>
               </div>
 
+              {/* Mensagem de erro (se houver) */}
               {errorMessage && errorMessage.startsWith('⚠️') && (
                 <div className="absolute top-16 left-4 right-4">
                   <div className="bg-yellow-500/20 border border-yellow-500 rounded-lg px-3 py-2 text-sm text-yellow-400">
@@ -342,9 +369,11 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
                 </div>
               )}
 
+              {/* Pontos de detecção de superfície */}
               {skinDetected && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative w-40 h-60">
+                    {/* Pontos de rastreamento AR */}
                     <div className="absolute top-8 left-1/2 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                     <div className="absolute top-20 left-6 w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
                     <div className="absolute top-20 right-6 w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
@@ -354,6 +383,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
                 </div>
               )}
 
+              {/* Tatuagem projetada sobre a superfície */}
               {skinDetected && (
                 <div 
                   className="absolute pointer-events-none"
@@ -381,9 +411,12 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
         )}
       </div>
 
+      {/* Controles AR - Bottom */}
       {cameraPermission === 'granted' && skinDetected && (
         <div className="bg-black/90 backdrop-blur-sm border-t border-white/20 p-4">
+          {/* Controles de ajuste */}
           <div className="space-y-3 mb-4">
+            {/* Tamanho */}
             <div className="flex items-center space-x-3">
               <ZoomOut className="w-4 h-4 text-white flex-shrink-0" />
               <div className="flex-1">
@@ -403,6 +436,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
               <ZoomIn className="w-4 h-4 text-white flex-shrink-0" />
             </div>
 
+            {/* Posição Horizontal */}
             <div className="flex items-center space-x-3">
               <Move className="w-4 h-4 text-white flex-shrink-0" />
               <div className="flex-1">
@@ -420,6 +454,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
               </div>
             </div>
 
+            {/* Posição Vertical */}
             <div className="flex items-center space-x-3">
               <Move className="w-4 h-4 text-white flex-shrink-0" />
               <div className="flex-1">
@@ -437,6 +472,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
               </div>
             </div>
 
+            {/* Rotação */}
             <div className="flex items-center space-x-3">
               <RotateCcw className="w-4 h-4 text-white flex-shrink-0" />
               <div className="flex-1">
@@ -456,6 +492,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
             </div>
           </div>
 
+          {/* Botões de ação */}
           <div className="flex items-center justify-center space-x-3">
             <button
               onClick={capturePhoto}
@@ -467,6 +504,7 @@ export default function ARCamera({ isOpen, onClose, selectedTattoo }: ARCameraPr
             </button>
           </div>
 
+          {/* Instruções */}
           <div className="text-center mt-3">
             <p className="text-white/60 text-xs">
               Mova o celular para ver a tatuagem de diferentes ângulos
