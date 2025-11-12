@@ -16,7 +16,7 @@ export default function TattoARApp() {
       id: 1, 
       name: 'Braço de Flor', 
       style: 'Floral', 
-      image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/8e2d1ae1-2df5-4b85-91e2-a8eebe69640d.png', 
+      image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/20df8435-9a26-4fe6-894e-e8f6cb7c0950.png', 
       complexity: 'Alta' 
     },
     { id: 2, name: 'Rosa Realista', style: 'Realista', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop', complexity: 'Média' },
@@ -403,7 +403,7 @@ export default function TattoARApp() {
                         {/* Tatuagem simulada - Braço de Flor */}
                         <div className="absolute top-16 sm:top-20 left-1/2 transform -translate-x-1/2 w-16 sm:w-20 h-16 sm:h-20 opacity-80">
                           <img
-                            src="https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/8e2d1ae1-2df5-4b85-91e2-a8eebe69640d.png"
+                            src="https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/20df8435-9a26-4fe6-894e-e8f6cb7c0950.png"
                             alt="Braço de Flor"
                             className="w-full h-full object-contain mix-blend-multiply"
                           />
