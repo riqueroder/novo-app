@@ -19,41 +19,11 @@ export default function TattoARApp() {
       image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/8e2d1ae1-2df5-4b85-91e2-a8eebe69640d.png', 
       complexity: 'Alta' 
     },
-    { 
-      id: 2, 
-      name: 'Rosa Realista', 
-      style: 'Realista', 
-      image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/0c3b1b04-71dd-42a5-a1b2-35cd126c043b.png', 
-      complexity: 'Média' 
-    },
-    { 
-      id: 3, 
-      name: 'Geométrico Minimal', 
-      style: 'Minimalista', 
-      image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/20df8435-9a26-4fe6-894e-e8f6cb7c0950.png', 
-      complexity: 'Baixa' 
-    },
-    { 
-      id: 4, 
-      name: 'Mandala Sagrada', 
-      style: 'Geométrico', 
-      image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/0c3b1b04-71dd-42a5-a1b2-35cd126c043b.png', 
-      complexity: 'Alta' 
-    },
-    { 
-      id: 5, 
-      name: 'Aquarela Abstrata', 
-      style: 'Aquarela', 
-      image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/20df8435-9a26-4fe6-894e-e8f6cb7c0950.png', 
-      complexity: 'Média' 
-    },
-    { 
-      id: 6, 
-      name: 'Biomecânico', 
-      style: 'Cyber', 
-      image: 'https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/8e2d1ae1-2df5-4b85-91e2-a8eebe69640d.png', 
-      complexity: 'Alta' 
-    }
+    { id: 2, name: 'Rosa Realista', style: 'Realista', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop', complexity: 'Média' },
+    { id: 3, name: 'Geométrico Minimal', style: 'Minimalista', image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=300&h=300&fit=crop', complexity: 'Baixa' },
+    { id: 4, name: 'Mandala Sagrada', style: 'Geométrico', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop', complexity: 'Alta' },
+    { id: 5, name: 'Aquarela Abstrata', style: 'Aquarela', image: 'https://images.unsplash.com/photo-1565058379802-bbe93b2f703a?w=300&h=300&fit=crop', complexity: 'Média' },
+    { id: 6, name: 'Biomecânico', style: 'Cyber', image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=300&h=300&fit=crop', complexity: 'Alta' }
   ];
 
   const testimonials = [
@@ -556,12 +526,11 @@ export default function TattoARApp() {
                   className="group bg-gray-50 border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-gray-400 transition-all duration-300 cursor-pointer"
                   onClick={() => setSelectedTattoo(tattoo)}
                 >
-                  <div className="relative aspect-square overflow-hidden bg-white">
+                  <div className="relative aspect-square overflow-hidden">
                     <img
                       src={tattoo.image}
                       alt={tattoo.name}
-                      className="w-full h-full object-contain transition-all duration-500"
-                      style={{ backgroundColor: 'transparent' }}
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -588,10 +557,7 @@ export default function TattoARApp() {
               </div>
               <h3 className="text-lg sm:text-xl font-bold mb-2">Design Personalizado</h3>
               <p className="text-gray-600 mb-4 sm:mb-6 text-sm">Envie sua própria arte para visualizar como tatuagem</p>
-              <button 
-                onClick={() => openARCamera()}
-                className="bg-gray-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors"
-              >
+              <button className="bg-gray-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors">
                 Fazer Upload
               </button>
             </div>
@@ -599,7 +565,7 @@ export default function TattoARApp() {
         </section>
       )}
 
-      {/* Seção Tecnologia AR - COM CÂMERA REAL */}
+      {/* Seção Tecnologia AR - Mobile First */}
       {activeSection === 'ar-tech' && (
         <section className="min-h-screen py-12 sm:py-20 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
@@ -608,27 +574,42 @@ export default function TattoARApp() {
                 Tecnologia AR em Ação
               </h2>
               <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-                Veja a câmera em tempo real com tatuagem projetada
+                Efeito futurista minimalista com precisão de última geração
               </p>
             </div>
 
-            {/* Demonstração visual da tecnologia - COM CÂMERA */}
+            {/* Demonstração visual da tecnologia - Mobile First */}
             <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mb-12 sm:mb-16">
               <div className="relative order-2 lg:order-1">
                 <div className="aspect-square bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 rounded-3xl border-2 border-gray-200 overflow-hidden relative">
-                  {/* Botão para abrir câmera */}
-                  <button
-                    onClick={() => openARCamera(tattooStyles[0])}
-                    className="absolute inset-0 flex items-center justify-center bg-black/5 hover:bg-black/10 transition-colors group"
-                  >
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                        <Camera className="w-10 h-10 text-white" />
-                      </div>
-                      <p className="text-gray-900 font-bold text-lg">Abrir Câmera AR</p>
-                      <p className="text-gray-600 text-sm mt-2">Clique para ver em tempo real</p>
+                  {/* Efeito de scanner AR */}
+                  <div className="absolute inset-0">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse"></div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse"></div>
+                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-blue-500 to-transparent animate-pulse"></div>
+                    <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-transparent via-blue-500 to-transparent animate-pulse"></div>
+                  </div>
+                  
+                  {/* Grid de análise */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="grid grid-cols-8 gap-px h-full">
+                      {Array.from({ length: 64 }).map((_, i) => (
+                        <div key={i} className="border border-blue-500/30"></div>
+                      ))}
                     </div>
-                  </button>
+                  </div>
+                  
+                  {/* Pontos de detecção */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative w-32 sm:w-40 h-48 sm:h-60">
+                      {/* Pontos de anatomia */}
+                      <div className="absolute top-6 sm:top-8 left-1/2 w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                      <div className="absolute top-16 sm:top-20 left-4 sm:left-6 w-2 h-2 bg-blue-500 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
+                      <div className="absolute top-16 sm:top-20 right-4 sm:right-6 w-2 h-2 bg-blue-500 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
+                      <div className="absolute top-24 sm:top-32 left-1/2 w-2 h-2 bg-blue-500 rounded-full animate-ping" style={{animationDelay: '1.5s'}}></div>
+                      <div className="absolute bottom-16 sm:bottom-20 left-1/2 w-2 h-2 bg-blue-500 rounded-full animate-ping" style={{animationDelay: '2s'}}></div>
+                    </div>
+                  </div>
                   
                   {/* Status da tecnologia */}
                   <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4">
@@ -708,7 +689,7 @@ export default function TattoARApp() {
                 </div>
 
                 <button 
-                  onClick={() => openARCamera(tattooStyles[0])}
+                  onClick={() => openARCamera()}
                   className="w-full bg-gray-900 text-white py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-3"
                 >
                   <Camera className="w-5 h-5" />
@@ -864,7 +845,7 @@ export default function TattoARApp() {
                   <img
                     src={selectedTattoo.image}
                     alt={selectedTattoo.name}
-                    className="w-full h-60 sm:h-80 object-contain rounded-2xl bg-white"
+                    className="w-full h-60 sm:h-80 object-cover rounded-2xl grayscale"
                   />
                 </div>
                 
